@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Showcase Hub</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .business { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+        #chatbot, #ads { display: none; position: fixed; top: 20%; left: 20%; background: white; border: 1px solid #000; padding: 20px; width: 300px; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Business Showcase Hub</h1>
+    <p>Business owners: Fill the form to display your business!</p>
+    
+    <form id="businessForm">
+        <input type="text" id="name" placeholder="Business Name" required><br><br>
+        <textarea id="desc" placeholder="Description" required></textarea><br><br>
+        <input type="email" id="email" placeholder="Contact Email" required><br><br>
+        <button type="submit">Display Business</button>
+    </form>
+    
+    <div id="businessList"></div>
+    
+    <button onclick="openWindow('chatbot')">Open AI Chatbot</button>
+    <button onclick="openWindow('ads')">Open AI Ads/Marketing</button>
+    
+    <div id="chatbot">
+        <h3>AI Business Chatbot</h3>
+        <input type="text" id="chatQuery" placeholder="Ask about a business">
+        <button onclick="chatWithAI()">Ask AI</button>
+        <p id="chatResponse"></p>
+        <button onclick="closeWindow('chatbot')">Close</button>
+    </div>
+    
+    <div id="ads">
+        <h3>AI Ads & Marketing</h3>
+        <input type="text" id="adInput" placeholder="Enter business details">
+        <button onclick="generateAd()">Generate Ad</button>
+        <p id="adOutput"></p>
+        <button onclick="closeWindow('ads')">Close</button>
+    </div>
+    
+    <script>
+        let businesses = [];
+        
+        document.getElementById('businessForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const desc = document.getElementById('desc').value;
+            const email = document.getElementById('email').value;
+            businesses.push({ name, desc, email });
+            displayBusinesses();
+            this.reset();
+        });
+        
+        function displayBusinesses() {
+            const list = document.getElementById('businessList');
+            list.innerHTML = businesses.map(b => `<div class="business"><h3>${b.name}</h3><p>${b.desc}</p><p>Contact: ${b.email}</p></div>`).join('');
+        }
+        
+        function openWindow(id) { document.getElementById(id).style.display = 'block'; }
+        function closeWindow(id) { document.getElementById(id).style.display = 'none'; }
+        
+        async function chatWithAI() {
+            const query = document.getElementById('chatQuery').value;
+            // Replace with real OpenAI API call (get key from openai.com)
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer YOUR_API_KEY' },
+                body: JSON.stringify({ model: 'gpt-3.5-turbo', messages: [{ role: 'user', content: query }] })
+            });
+            const data = await response.json();
+            document.getElementById('chatResponse').innerText = data.choices[0].message.content;
+        }
+        
+        async function generateAd() {
+            const input = document.getElementById('adInput').value;
+            // Similar API call for ad generation
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer YOUR_API_KEY' },
+                body: JSON.stringify({ model: 'gpt-3.5-turbo', messages: [{ role: 'user', content: `Generate a catchy ad for: ${input}` }] })
+            });
+            const data = await response.json();
+            document.getElementById('adOutput').innerText = data.choices[0].message.content;
+        }
+    </script>
+</body>
+</html>
